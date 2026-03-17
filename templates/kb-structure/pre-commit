@@ -1,0 +1,31 @@
+#!/bin/bash
+# KB pre-commit hook: frontmatter validation + secret detection
+ERRORS=0
+for f in $(git diff --cached --name-only --diff-filter=ACM -- '*.md'); do
+  case "$f" in .kb/*|templates/*|99-personal/*|00-inbox/*) continue;; esac
+
+  if ! head -1 "$f" | grep -q '^---'; then
+    echo "ERROR: $f — frontmatter 없음"; ERRORS=$((ERRORS+1))
+  fi
+  if ! grep -q 'tldr:' "$f"; then
+    echo "ERROR: $f — tldr 필드 없음"; ERRORS=$((ERRORS+1))
+  fi
+  if ! grep -q 'tags:' "$f"; then
+    echo "ERROR: $f — tags 필드 없음"; ERRORS=$((ERRORS+1))
+  fi
+done
+
+# Secret detection — gitleaks first, regex fallback
+if command -v gitleaks &> /dev/null; then
+  gitleaks protect --staged --no-banner
+  if [ $? -ne 0 ]; then
+    echo "ERROR: gitleaks가 민감 정보를 탐지했습니다."; ERRORS=$((ERRORS+1))
+  fi
+else
+  if git diff --cached --name-only --diff-filter=ACM -- '*.md' | xargs grep -l 'password\|secret\|jdbc:\|api[_-]key\|token=' 2>/dev/null; then
+    echo "ERROR: 민감 정보가 포함된 파일이 있습니다."; ERRORS=$((ERRORS+1))
+    echo "TIP: brew install gitleaks 로 더 정밀한 탐지를 사용할 수 있습니다."
+  fi
+fi
+
+if [ $ERRORS -gt 0 ]; then exit 1; fi

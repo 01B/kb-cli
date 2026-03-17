@@ -1,0 +1,71 @@
+name: KB Health Check
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 9 * * 1'
+
+concurrency:
+  group: kb-index-update
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: frontmatter 검증
+        run: |
+          ERRORS=0
+          for f in $(find . -name '*.md' \
+            -not -path './.kb/*' \
+            -not -path './templates/*' \
+            -not -path './99-personal/*' \
+            -not -path './00-inbox/*' \
+            -not -path './.github/*'); do
+            if ! head -1 "$f" | grep -q '^---'; then
+              echo "MISSING frontmatter: $f"; ERRORS=$((ERRORS+1))
+            fi
+            if ! grep -q 'tldr:' "$f"; then
+              echo "MISSING tldr: $f"; ERRORS=$((ERRORS+1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then exit 1; fi
+
+      - name: 민감 정보 검사
+        run: |
+          if grep -rn 'password\|secret\|jdbc:\|api[_-]key\|token=' --include='*.md' \
+            --exclude-dir=.kb --exclude-dir=templates .; then
+            echo "ERROR: 민감 정보 포함"; exit 1
+          fi
+
+      - name: 빈 노트 탐지
+        run: |
+          find . -name '*.md' -not -path './.kb/*' -not -path './templates/*' \
+            -size -50c -exec echo "거의 빈 파일: {}" \;
+
+      - name: kb-index.json 갱신
+        run: |
+          echo "[" > kb-index.json
+          FIRST=true
+          for f in $(find . -name '*.md' \
+            -not -path './.kb/*' -not -path './templates/*' \
+            -not -path './99-personal/*' -not -path './00-inbox/*' \
+            -not -path './.github/*' -not -name 'README.md'); do
+            TAGS=$(grep -m1 'tags:' "$f" 2>/dev/null | sed 's/tags: *//')
+            TLDR=$(grep -m1 'tldr:' "$f" 2>/dev/null | sed 's/tldr: *//')
+            UPDATED=$(grep -m1 'updated:' "$f" 2>/dev/null | sed 's/updated: *//')
+            if [ "$FIRST" = true ]; then FIRST=false; else echo "," >> kb-index.json; fi
+            printf '  {"path":"%s","tags":%s,"tldr":%s,"updated":"%s"}' \
+              "$f" "${TAGS:-[]}" "${TLDR:-\"\"}" "${UPDATED:-unknown}" >> kb-index.json
+          done
+          echo "" >> kb-index.json
+          echo "]" >> kb-index.json
+
+      - name: kb-index.json 커밋
+        run: |
+          git config user.name "kb-bot"
+          git config user.email "kb-bot@noreply"
+          git add kb-index.json
+          git diff --cached --quiet || (git commit -m "chore: update kb-index.json" && git pull --rebase origin main && git push)

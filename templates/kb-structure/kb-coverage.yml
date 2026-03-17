@@ -1,0 +1,50 @@
+name: KB Coverage Report
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 폴더별 노트 수
+        run: |
+          echo "=== 폴더별 노트 수 ==="
+          for dir in global rules analysis decisions troubleshoot drafts areas; do
+            COUNT=$(find "./$dir" -name '*.md' 2>/dev/null | wc -l)
+            echo "  $dir: ${COUNT}개"
+          done
+
+      - name: 태그별 노트 수
+        run: |
+          echo "=== 태그별 노트 수 ==="
+          grep -roh 'tags:.*' --include='*.md' . | \
+            sed 's/tags://;s/\[//;s/\]//;s/,/\n/g' | \
+            sed 's/^ *//;s/ *$//' | sort | uniq -c | sort -rn
+
+      - name: Stale 노트 탐지 (90일 이상 미갱신)
+        run: |
+          echo "=== Stale 후보 (90일+ 미갱신) ==="
+          THRESHOLD=$(date -d '90 days ago' +%Y-%m-%d 2>/dev/null || date -v-90d +%Y-%m-%d)
+          for f in $(find . -name '*.md' \
+            -not -path './.kb/*' -not -path './templates/*' \
+            -not -path './99-personal/*' -not -path './00-inbox/*' \
+            -not -path './.github/*' -not -path './archive/*'); do
+            UPDATED=$(grep -m1 'updated:' "$f" 2>/dev/null | sed 's/updated: *//' | tr -d ' ')
+            if [ -n "$UPDATED" ] && [ "$UPDATED" \< "$THRESHOLD" ]; then
+              echo "  STALE: $f (updated: $UPDATED)"
+            fi
+          done
+
+      - name: ai-context/ 오버뷰 신선도 체크 (30일)
+        run: |
+          echo "=== 오버뷰 신선도 ==="
+          THRESHOLD=$(date -d '30 days ago' +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)
+          for f in $(find ./ai-context -name '*.md' 2>/dev/null); do
+            UPDATED=$(grep -m1 'updated:' "$f" 2>/dev/null | sed 's/updated: *//' | tr -d ' ')
+            if [ -n "$UPDATED" ] && [ "$UPDATED" \< "$THRESHOLD" ]; then
+              echo "  WARNING: $f 오버뷰가 30일 이상 미갱신 (updated: $UPDATED)"
+            fi
+          done

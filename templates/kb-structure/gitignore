@@ -1,0 +1,6 @@
+00-inbox/
+99-personal/
+.kb-index.local.json
+.obsidian/
+*.tmp
+.DS_Store

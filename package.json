@@ -1,0 +1,38 @@
+{
+  "name": "kb-cli",
+  "version": "0.1.0",
+  "description": "Team Knowledge Base harness CLI - scaffold, wire, and manage KB for LLM-assisted development",
+  "type": "module",
+  "bin": {
+    "kb": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepare": "npm run build",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.0.0",
+    "commander": "^13.0.0",
+    "fs-extra": "^11.0.0",
+    "picocolors": "^1.0.0",
+    "simple-git": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.0",
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "license": "MIT"
+}
