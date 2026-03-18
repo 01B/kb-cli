@@ -1,6 +1,6 @@
 {
   "name": "@01b/team-kb",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Team Knowledge Base harness CLI - scaffold, wire, and manage KB for LLM-assisted development",
   "type": "module",
   "bin": {
