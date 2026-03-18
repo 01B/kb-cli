@@ -37,6 +37,7 @@ if [ $ERRORS -gt 0 ]; then exit 1; fi
 STAGED_MD=$(git diff --cached --name-only --diff-filter=ACDMR -- '*.md')
 if [ -n "$STAGED_MD" ]; then
   "$KB_ROOT/.kb/scripts/rebuild-index.sh" > /dev/null
-  git add "$KB_ROOT/kb-index.json" "$KB_ROOT/.kb-index.local.json" 2>/dev/null
+  cp "$KB_ROOT/.kb-index.local.json" "$KB_ROOT/kb-index.json"
+  git add "$KB_ROOT/kb-index.json" 2>/dev/null
   echo "kb-index 자동 갱신 완료"
 fi
