@@ -4,14 +4,8 @@ import { log } from "../utils/log.js";
 import { ensureGitignorePatterns } from "../utils/gitignore.js";
 import type { WireContext } from "./wire.js";
 
-function buildGeminiMd(ctx: WireContext): string {
-  let content = "@.gemini/kb-import.md\n";
-  content += "\n## 프로젝트\n";
-  content += `- ${ctx.techStack}\n`;
-  if (ctx.domains) content += `- 담당: ${ctx.domains}\n`;
-  content += `- 현재 repo: ${ctx.repoName}\n`;
-
-  return content;
+function buildGeminiMd(): string {
+  return "@.gemini/kb-import.md\n";
 }
 
 function buildKbImportMd(ctx: WireContext): string {
@@ -47,18 +41,20 @@ export async function wireGemini(ctx: WireContext): Promise<void> {
   const geminiDir = path.join(ctx.projectRoot, ".gemini");
   await fs.ensureDir(geminiDir);
 
-  // 1. GEMINI.md (tracked — project info + @import)
+  // 1. GEMINI.md (tracked — @import only)
   const geminiMdPath = path.join(ctx.projectRoot, "GEMINI.md");
+  const importLine = buildGeminiMd();
   if (fs.existsSync(geminiMdPath)) {
     const existing = await fs.readFile(geminiMdPath, "utf-8");
-    if (!existing.includes("## 프로젝트")) {
-      await fs.appendFile(geminiMdPath, "\n" + buildGeminiMd(ctx));
-      log.step("GEMINI.md에 프로젝트 정보 추가");
+    if (!existing.includes("@.gemini/kb-import.md")) {
+      const updated = importLine + "\n" + existing;
+      await fs.writeFile(geminiMdPath, updated);
+      log.step("GEMINI.md에 KB @import 추가");
     } else {
-      log.step("GEMINI.md에 프로젝트 정보 이미 존재 — 스킵");
+      log.step("GEMINI.md에 KB @import 이미 존재 — 스킵");
     }
   } else {
-    await fs.writeFile(geminiMdPath, buildGeminiMd(ctx));
+    await fs.writeFile(geminiMdPath, importLine);
     log.step("GEMINI.md 생성");
   }
 

@@ -4,15 +4,8 @@ import { log } from "../utils/log.js";
 import { ensureGitignorePatterns } from "../utils/gitignore.js";
 import type { WireContext } from "./wire.js";
 
-function buildAgentsMd(ctx: WireContext): string {
-  let content = "# Project\n";
-  content += `- ${ctx.techStack}\n`;
-  if (ctx.domains) content += `- 담당: ${ctx.domains}\n`;
-  content += `- 현재 repo: ${ctx.repoName}\n`;
-  content += "\n# Knowledge Base\n";
-  content += "- 세션 시작 시 반드시 .codex/kb-directive.md 파일을 먼저 읽고 그 안의 경로 지시를 따를 것\n";
-
-  return content;
+function buildAgentsMd(): string {
+  return "# Knowledge Base\n- 세션 시작 시 반드시 .codex/kb-directive.md 파일을 먼저 읽고 그 안의 경로 지시를 따를 것\n";
 }
 
 function buildDirectiveMd(ctx: WireContext): string {
@@ -34,18 +27,19 @@ export async function wireCodex(ctx: WireContext): Promise<void> {
   const codexDir = path.join(ctx.projectRoot, ".codex");
   await fs.ensureDir(codexDir);
 
-  // 1. AGENTS.md (tracked — project info + directive reference)
+  // 1. AGENTS.md (tracked — KB directive reference only)
   const agentsMdPath = path.join(ctx.projectRoot, "AGENTS.md");
+  const kbDirective = buildAgentsMd();
   if (fs.existsSync(agentsMdPath)) {
     const existing = await fs.readFile(agentsMdPath, "utf-8");
-    if (!existing.includes("# Project")) {
-      await fs.appendFile(agentsMdPath, "\n" + buildAgentsMd(ctx));
-      log.step("AGENTS.md에 프로젝트 정보 추가");
+    if (!existing.includes("# Knowledge Base")) {
+      await fs.appendFile(agentsMdPath, "\n" + kbDirective);
+      log.step("AGENTS.md에 KB 지시문 추가");
     } else {
-      log.step("AGENTS.md에 프로젝트 정보 이미 존재 — 스킵");
+      log.step("AGENTS.md에 KB 지시문 이미 존재 — 스킵");
     }
   } else {
-    await fs.writeFile(agentsMdPath, buildAgentsMd(ctx));
+    await fs.writeFile(agentsMdPath, kbDirective);
     log.step("AGENTS.md 생성");
   }
 

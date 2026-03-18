@@ -10,10 +10,6 @@ export interface WireContext {
   kbPath: string;
   /** Current project root (cwd) */
   projectRoot: string;
-  /** Tech stack (e.g., "Spring Boot + Kotlin, Gradle") */
-  techStack: string;
-  /** Domain areas (e.g., "할인/쿠폰, 수수료") */
-  domains: string;
   /** Current repo name (e.g., "coupon-api") */
   repoName: string;
 }
@@ -36,17 +32,7 @@ async function collectWireContext(): Promise<WireContext | null> {
   const repoName =
     projectRoot.split("/").pop() || "unknown";
 
-  const techStack = await input({
-    message: "기술 스택",
-    default: "Spring Boot + Kotlin, Gradle",
-  });
-
-  const domains = await input({
-    message: "담당 도메인",
-    default: "",
-  });
-
-  return { kbPath, projectRoot, techStack, domains, repoName };
+  return { kbPath, projectRoot, repoName };
 }
 
 export async function wireCommand(tool: string): Promise<void> {

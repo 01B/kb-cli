@@ -277,16 +277,6 @@ async function ensureGitignorePatterns(dir, patterns) {
 }
 
 // src/commands/wire-claude.ts
-function buildProjectSection(ctx) {
-  let section = "\n## \uD504\uB85C\uC81D\uD2B8\n";
-  section += `- ${ctx.techStack}
-`;
-  if (ctx.domains) section += `- \uB2F4\uB2F9: ${ctx.domains}
-`;
-  section += `- \uD604\uC7AC repo: ${ctx.repoName}
-`;
-  return section;
-}
 function buildKbLocationContent(ctx) {
   return `## KB \uC808\uB300 \uACBD\uB85C
 LLM\uC740 \uD30C\uC77C \uC811\uADFC \uBC0F \uC258 \uC2A4\uD06C\uB9BD\uD2B8 \uC2E4\uD589 \uC2DC \uBC18\uB4DC\uC2DC \uC544\uB798\uC758 \uC808\uB300 \uACBD\uB85C\uB97C \uADF8\uB300\uB85C \uC0AC\uC6A9\uD560 \uAC83.
@@ -299,20 +289,6 @@ LLM\uC740 \uD30C\uC77C \uC811\uADFC \uBC0F \uC258 \uC2A4\uD06C\uB9BD\uD2B8 \uC2E
 async function wireClaude(ctx) {
   const rulesDir = path6.join(ctx.projectRoot, ".claude", "rules");
   await fs7.ensureDir(rulesDir);
-  const claudeMdPath = path6.join(ctx.projectRoot, "CLAUDE.md");
-  const projectSection = buildProjectSection(ctx);
-  if (fs7.existsSync(claudeMdPath)) {
-    const existing = await fs7.readFile(claudeMdPath, "utf-8");
-    if (!existing.includes("## \uD504\uB85C\uC81D\uD2B8")) {
-      await fs7.appendFile(claudeMdPath, projectSection);
-      log.step("CLAUDE.md\uC5D0 \uD504\uB85C\uC81D\uD2B8 \uC815\uBCF4 \uCD94\uAC00");
-    } else {
-      log.step("CLAUDE.md\uC5D0 \uD504\uB85C\uC81D\uD2B8 \uC815\uBCF4 \uC774\uBBF8 \uC874\uC7AC \u2014 \uC2A4\uD0B5");
-    }
-  } else {
-    await fs7.writeFile(claudeMdPath, projectSection.trimStart());
-    log.step("CLAUDE.md \uC0DD\uC131");
-  }
   const aiContextDir = path6.join(ctx.kbPath, "ai-context");
   const symlinkTargets = [
     { name: "kb-rules.md", target: path6.join(aiContextDir, "kb-rules.md") },
@@ -349,16 +325,8 @@ async function wireClaude(ctx) {
 // src/commands/wire-gemini.ts
 import fs8 from "fs-extra";
 import path7 from "path";
-function buildGeminiMd(ctx) {
-  let content = "@.gemini/kb-import.md\n";
-  content += "\n## \uD504\uB85C\uC81D\uD2B8\n";
-  content += `- ${ctx.techStack}
-`;
-  if (ctx.domains) content += `- \uB2F4\uB2F9: ${ctx.domains}
-`;
-  content += `- \uD604\uC7AC repo: ${ctx.repoName}
-`;
-  return content;
+function buildGeminiMd() {
+  return "@.gemini/kb-import.md\n";
 }
 function buildKbImportMd(ctx) {
   const aiContext = path7.join(ctx.kbPath, "ai-context");
@@ -389,16 +357,18 @@ async function wireGemini(ctx) {
   const geminiDir = path7.join(ctx.projectRoot, ".gemini");
   await fs8.ensureDir(geminiDir);
   const geminiMdPath = path7.join(ctx.projectRoot, "GEMINI.md");
+  const importLine = buildGeminiMd();
   if (fs8.existsSync(geminiMdPath)) {
     const existing = await fs8.readFile(geminiMdPath, "utf-8");
-    if (!existing.includes("## \uD504\uB85C\uC81D\uD2B8")) {
-      await fs8.appendFile(geminiMdPath, "\n" + buildGeminiMd(ctx));
-      log.step("GEMINI.md\uC5D0 \uD504\uB85C\uC81D\uD2B8 \uC815\uBCF4 \uCD94\uAC00");
+    if (!existing.includes("@.gemini/kb-import.md")) {
+      const updated = importLine + "\n" + existing;
+      await fs8.writeFile(geminiMdPath, updated);
+      log.step("GEMINI.md\uC5D0 KB @import \uCD94\uAC00");
     } else {
-      log.step("GEMINI.md\uC5D0 \uD504\uB85C\uC81D\uD2B8 \uC815\uBCF4 \uC774\uBBF8 \uC874\uC7AC \u2014 \uC2A4\uD0B5");
+      log.step("GEMINI.md\uC5D0 KB @import \uC774\uBBF8 \uC874\uC7AC \u2014 \uC2A4\uD0B5");
     }
   } else {
-    await fs8.writeFile(geminiMdPath, buildGeminiMd(ctx));
+    await fs8.writeFile(geminiMdPath, importLine);
     log.step("GEMINI.md \uC0DD\uC131");
   }
   const importPath = path7.join(geminiDir, "kb-import.md");
@@ -418,17 +388,8 @@ async function wireGemini(ctx) {
 // src/commands/wire-codex.ts
 import fs9 from "fs-extra";
 import path8 from "path";
-function buildAgentsMd(ctx) {
-  let content = "# Project\n";
-  content += `- ${ctx.techStack}
-`;
-  if (ctx.domains) content += `- \uB2F4\uB2F9: ${ctx.domains}
-`;
-  content += `- \uD604\uC7AC repo: ${ctx.repoName}
-`;
-  content += "\n# Knowledge Base\n";
-  content += "- \uC138\uC158 \uC2DC\uC791 \uC2DC \uBC18\uB4DC\uC2DC .codex/kb-directive.md \uD30C\uC77C\uC744 \uBA3C\uC800 \uC77D\uACE0 \uADF8 \uC548\uC758 \uACBD\uB85C \uC9C0\uC2DC\uB97C \uB530\uB97C \uAC83\n";
-  return content;
+function buildAgentsMd() {
+  return "# Knowledge Base\n- \uC138\uC158 \uC2DC\uC791 \uC2DC \uBC18\uB4DC\uC2DC .codex/kb-directive.md \uD30C\uC77C\uC744 \uBA3C\uC800 \uC77D\uACE0 \uADF8 \uC548\uC758 \uACBD\uB85C \uC9C0\uC2DC\uB97C \uB530\uB97C \uAC83\n";
 }
 function buildDirectiveMd(ctx) {
   const aiContext = path8.join(ctx.kbPath, "ai-context");
@@ -447,16 +408,17 @@ async function wireCodex(ctx) {
   const codexDir = path8.join(ctx.projectRoot, ".codex");
   await fs9.ensureDir(codexDir);
   const agentsMdPath = path8.join(ctx.projectRoot, "AGENTS.md");
+  const kbDirective = buildAgentsMd();
   if (fs9.existsSync(agentsMdPath)) {
     const existing = await fs9.readFile(agentsMdPath, "utf-8");
-    if (!existing.includes("# Project")) {
-      await fs9.appendFile(agentsMdPath, "\n" + buildAgentsMd(ctx));
-      log.step("AGENTS.md\uC5D0 \uD504\uB85C\uC81D\uD2B8 \uC815\uBCF4 \uCD94\uAC00");
+    if (!existing.includes("# Knowledge Base")) {
+      await fs9.appendFile(agentsMdPath, "\n" + kbDirective);
+      log.step("AGENTS.md\uC5D0 KB \uC9C0\uC2DC\uBB38 \uCD94\uAC00");
     } else {
-      log.step("AGENTS.md\uC5D0 \uD504\uB85C\uC81D\uD2B8 \uC815\uBCF4 \uC774\uBBF8 \uC874\uC7AC \u2014 \uC2A4\uD0B5");
+      log.step("AGENTS.md\uC5D0 KB \uC9C0\uC2DC\uBB38 \uC774\uBBF8 \uC874\uC7AC \u2014 \uC2A4\uD0B5");
     }
   } else {
-    await fs9.writeFile(agentsMdPath, buildAgentsMd(ctx));
+    await fs9.writeFile(agentsMdPath, kbDirective);
     log.step("AGENTS.md \uC0DD\uC131");
   }
   const directivePath = path8.join(codexDir, "kb-directive.md");
@@ -482,15 +444,7 @@ async function collectWireContext() {
   }
   const projectRoot = process.cwd();
   const repoName = projectRoot.split("/").pop() || "unknown";
-  const techStack = await input3({
-    message: "\uAE30\uC220 \uC2A4\uD0DD",
-    default: "Spring Boot + Kotlin, Gradle"
-  });
-  const domains = await input3({
-    message: "\uB2F4\uB2F9 \uB3C4\uBA54\uC778",
-    default: ""
-  });
-  return { kbPath, projectRoot, techStack, domains, repoName };
+  return { kbPath, projectRoot, repoName };
 }
 async function wireCommand(tool) {
   const validTools = ["claude", "gemini", "codex"];

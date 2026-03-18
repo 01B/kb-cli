@@ -5,15 +5,6 @@ import { createSymlink } from "../utils/symlink.js";
 import { ensureGitignorePatterns } from "../utils/gitignore.js";
 import type { WireContext } from "./wire.js";
 
-function buildProjectSection(ctx: WireContext): string {
-  let section = "\n## 프로젝트\n";
-  section += `- ${ctx.techStack}\n`;
-  if (ctx.domains) section += `- 담당: ${ctx.domains}\n`;
-  section += `- 현재 repo: ${ctx.repoName}\n`;
-
-  return section;
-}
-
 function buildKbLocationContent(ctx: WireContext): string {
   return `## KB 절대 경로
 LLM은 파일 접근 및 쉘 스크립트 실행 시 반드시 아래의 절대 경로를 그대로 사용할 것.
@@ -28,24 +19,7 @@ export async function wireClaude(ctx: WireContext): Promise<void> {
   const rulesDir = path.join(ctx.projectRoot, ".claude", "rules");
   await fs.ensureDir(rulesDir);
 
-  // 1. CLAUDE.md — append project info (don't overwrite)
-  const claudeMdPath = path.join(ctx.projectRoot, "CLAUDE.md");
-  const projectSection = buildProjectSection(ctx);
-
-  if (fs.existsSync(claudeMdPath)) {
-    const existing = await fs.readFile(claudeMdPath, "utf-8");
-    if (!existing.includes("## 프로젝트")) {
-      await fs.appendFile(claudeMdPath, projectSection);
-      log.step("CLAUDE.md에 프로젝트 정보 추가");
-    } else {
-      log.step("CLAUDE.md에 프로젝트 정보 이미 존재 — 스킵");
-    }
-  } else {
-    await fs.writeFile(claudeMdPath, projectSection.trimStart());
-    log.step("CLAUDE.md 생성");
-  }
-
-  // 2. Symlinks to KB ai-context files
+  // 1. Symlinks to KB ai-context files
   const aiContextDir = path.join(ctx.kbPath, "ai-context");
   const symlinkTargets = [
     { name: "kb-rules.md", target: path.join(aiContextDir, "kb-rules.md") },
@@ -74,14 +48,14 @@ export async function wireClaude(ctx: WireContext): Promise<void> {
   await fs.writeFile(locationPath, buildKbLocationContent(ctx));
   log.step("kb-location.md 생성 (KB 절대 경로)");
 
-  // 4. .claude/settings.json
+  // 3. .claude/settings.json
   const settingsPath = path.join(ctx.projectRoot, ".claude", "settings.json");
   if (!fs.existsSync(settingsPath)) {
     await fs.writeJson(settingsPath, {}, { spaces: 2 });
     log.step(".claude/settings.json 생성");
   }
 
-  // 5. Update .gitignore
+  // 4. Update .gitignore
   await ensureGitignorePatterns(ctx.projectRoot, [
     ".claude/rules/",
   ]);
