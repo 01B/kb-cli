@@ -329,7 +329,6 @@ function buildGeminiMd() {
   return "@.gemini/kb-import.md\n";
 }
 function buildKbImportMd(ctx) {
-  const aiContext = path7.join(ctx.kbPath, "ai-context");
   let content = `## KB \uC808\uB300 \uACBD\uB85C
 LLM\uC740 \uD30C\uC77C \uC811\uADFC \uBC0F \uC258 \uC2A4\uD06C\uB9BD\uD2B8 \uC2E4\uD589 \uC2DC \uBC18\uB4DC\uC2DC \uC544\uB798\uC758 \uC808\uB300 \uACBD\uB85C\uB97C \uADF8\uB300\uB85C \uC0AC\uC6A9\uD560 \uAC83.
 - KB \uB8E8\uD2B8: ${ctx.kbPath}
@@ -338,15 +337,14 @@ LLM\uC740 \uD30C\uC77C \uC811\uADFC \uBC0F \uC258 \uC2A4\uD06C\uB9BD\uD2B8 \uC2E
 - \uB85C\uCEEC \uC778\uB371\uC2A4 \uC7AC\uC0DD\uC131 \uC2A4\uD06C\uB9BD\uD2B8: ${ctx.kbPath}/.kb/scripts/rebuild-index.sh
 
 `;
-  content += `@${aiContext}/kb-rules.md
-`;
-  content += `@${aiContext}/team-focus.md
-`;
+  content += "@kb-context/kb-rules.md\n";
+  content += "@kb-context/team-focus.md\n";
+  const aiContext = path7.join(ctx.kbPath, "ai-context");
   if (fs8.existsSync(aiContext)) {
     const files = fs8.readdirSync(aiContext);
     for (const file of files) {
       if (file.endsWith("-overview.md")) {
-        content += `@${aiContext}/${file}
+        content += `@kb-context/${file}
 `;
       }
     }
@@ -371,6 +369,9 @@ async function wireGemini(ctx) {
     await fs8.writeFile(geminiMdPath, importLine);
     log.step("GEMINI.md \uC0DD\uC131");
   }
+  const aiContextDir = path7.join(ctx.kbPath, "ai-context");
+  const kbContextLink = path7.join(geminiDir, "kb-context");
+  await createSymlink(aiContextDir, kbContextLink);
   const importPath = path7.join(geminiDir, "kb-import.md");
   await fs8.writeFile(importPath, buildKbImportMd(ctx));
   log.step(".gemini/kb-import.md \uC0DD\uC131 (KB \uACBD\uB85C + @import)");
@@ -380,7 +381,8 @@ async function wireGemini(ctx) {
     log.step(".gemini/settings.json \uC0DD\uC131");
   }
   await ensureGitignorePatterns(ctx.projectRoot, [
-    ".gemini/kb-import.md"
+    ".gemini/kb-import.md",
+    ".gemini/kb-context"
   ]);
   log.success("Gemini CLI \uC5F0\uACB0 \uC644\uB8CC");
 }
