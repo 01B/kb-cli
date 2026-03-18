@@ -285,13 +285,6 @@ function buildProjectSection(ctx) {
 `;
   section += `- \uD604\uC7AC repo: ${ctx.repoName}
 `;
-  if (ctx.terms.length > 0) {
-    section += "\n## \uB3C4\uBA54\uC778 \uC6A9\uC5B4\n";
-    for (const { term, definition } of ctx.terms) {
-      section += `- ${term}: ${definition}
-`;
-    }
-  }
   return section;
 }
 function buildKbLocationContent(ctx) {
@@ -365,13 +358,6 @@ function buildGeminiMd(ctx) {
 `;
   content += `- \uD604\uC7AC repo: ${ctx.repoName}
 `;
-  if (ctx.terms.length > 0) {
-    content += "\n## \uB3C4\uBA54\uC778 \uC6A9\uC5B4\n";
-    for (const { term, definition } of ctx.terms) {
-      content += `- ${term}: ${definition}
-`;
-    }
-  }
   return content;
 }
 function buildKbImportMd(ctx) {
@@ -442,13 +428,6 @@ function buildAgentsMd(ctx) {
 `;
   content += "\n# Knowledge Base\n";
   content += "- \uC138\uC158 \uC2DC\uC791 \uC2DC \uBC18\uB4DC\uC2DC .codex/kb-directive.md \uD30C\uC77C\uC744 \uBA3C\uC800 \uC77D\uACE0 \uADF8 \uC548\uC758 \uACBD\uB85C \uC9C0\uC2DC\uB97C \uB530\uB97C \uAC83\n";
-  if (ctx.terms.length > 0) {
-    content += "\n# \uB3C4\uBA54\uC778 \uC6A9\uC5B4\n";
-    for (const { term, definition } of ctx.terms) {
-      content += `- ${term}: ${definition}
-`;
-    }
-  }
   return content;
 }
 function buildDirectiveMd(ctx) {
@@ -511,20 +490,7 @@ async function collectWireContext() {
     message: "\uB2F4\uB2F9 \uB3C4\uBA54\uC778",
     default: ""
   });
-  const terms = [];
-  log.info("\uB3C4\uBA54\uC778 \uC6A9\uC5B4\uB97C \uC785\uB825\uD558\uC138\uC694 (\uBE48 \uC904\uB85C \uC885\uB8CC):");
-  while (true) {
-    const term = await input3({
-      message: "\uC6A9\uC5B4 (\uC5D4\uD130\uB85C \uC885\uB8CC)",
-      default: ""
-    });
-    if (!term) break;
-    const definition = await input3({
-      message: `${term}\uC758 \uC815\uC758`
-    });
-    terms.push({ term, definition });
-  }
-  return { kbPath, projectRoot, techStack, domains, repoName, terms };
+  return { kbPath, projectRoot, techStack, domains, repoName };
 }
 async function wireCommand(tool) {
   const validTools = ["claude", "gemini", "codex"];

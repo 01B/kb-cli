@@ -11,13 +11,6 @@ function buildGeminiMd(ctx: WireContext): string {
   if (ctx.domains) content += `- 담당: ${ctx.domains}\n`;
   content += `- 현재 repo: ${ctx.repoName}\n`;
 
-  if (ctx.terms.length > 0) {
-    content += "\n## 도메인 용어\n";
-    for (const { term, definition } of ctx.terms) {
-      content += `- ${term}: ${definition}\n`;
-    }
-  }
-
   return content;
 }
 

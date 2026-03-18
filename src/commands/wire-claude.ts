@@ -11,13 +11,6 @@ function buildProjectSection(ctx: WireContext): string {
   if (ctx.domains) section += `- 담당: ${ctx.domains}\n`;
   section += `- 현재 repo: ${ctx.repoName}\n`;
 
-  if (ctx.terms.length > 0) {
-    section += "\n## 도메인 용어\n";
-    for (const { term, definition } of ctx.terms) {
-      section += `- ${term}: ${definition}\n`;
-    }
-  }
-
   return section;
 }
 

@@ -12,13 +12,6 @@ function buildAgentsMd(ctx: WireContext): string {
   content += "\n# Knowledge Base\n";
   content += "- 세션 시작 시 반드시 .codex/kb-directive.md 파일을 먼저 읽고 그 안의 경로 지시를 따를 것\n";
 
-  if (ctx.terms.length > 0) {
-    content += "\n# 도메인 용어\n";
-    for (const { term, definition } of ctx.terms) {
-      content += `- ${term}: ${definition}\n`;
-    }
-  }
-
   return content;
 }
 

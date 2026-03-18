@@ -16,8 +16,6 @@ export interface WireContext {
   domains: string;
   /** Current repo name (e.g., "coupon-api") */
   repoName: string;
-  /** Domain terms (key-value pairs) */
-  terms: Array<{ term: string; definition: string }>;
 }
 
 async function collectWireContext(): Promise<WireContext | null> {
@@ -48,22 +46,7 @@ async function collectWireContext(): Promise<WireContext | null> {
     default: "",
   });
 
-  // Collect domain terms
-  const terms: Array<{ term: string; definition: string }> = [];
-  log.info("도메인 용어를 입력하세요 (빈 줄로 종료):");
-  while (true) {
-    const term = await input({
-      message: "용어 (엔터로 종료)",
-      default: "",
-    });
-    if (!term) break;
-    const definition = await input({
-      message: `${term}의 정의`,
-    });
-    terms.push({ term, definition });
-  }
-
-  return { kbPath, projectRoot, techStack, domains, repoName, terms };
+  return { kbPath, projectRoot, techStack, domains, repoName };
 }
 
 export async function wireCommand(tool: string): Promise<void> {
