@@ -8,7 +8,7 @@ import { saveKbPath } from "../utils/config.js";
 import { initRepo } from "../utils/git.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = path.join(__dirname, "..", "..", "templates", "kb-structure");
+const TEMPLATES_DIR = path.join(__dirname, "..", "templates", "kb-structure");
 
 const KB_DIRS = [
   "global",

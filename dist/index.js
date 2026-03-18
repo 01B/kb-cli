@@ -81,7 +81,7 @@ async function cloneRepo(url, dir) {
 
 // src/commands/init.ts
 var __dirname = path2.dirname(fileURLToPath(import.meta.url));
-var TEMPLATES_DIR = path2.join(__dirname, "..", "..", "templates", "kb-structure");
+var TEMPLATES_DIR = path2.join(__dirname, "..", "templates", "kb-structure");
 var KB_DIRS = [
   "global",
   "rules",

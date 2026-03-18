@@ -1,10 +1,10 @@
 {
-  "name": "kb-cli",
-  "version": "0.1.0",
+  "name": "@01b/team-kb",
+  "version": "0.1.1",
   "description": "Team Knowledge Base harness CLI - scaffold, wire, and manage KB for LLM-assisted development",
   "type": "module",
   "bin": {
-    "kb": "./dist/index.js"
+    "kb": "dist/index.js"
   },
   "scripts": {
     "build": "tsup",
