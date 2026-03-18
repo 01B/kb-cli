@@ -6,7 +6,7 @@ import { ensureGitignorePatterns } from "../utils/gitignore.js";
 import type { WireContext } from "./wire.js";
 
 function buildGeminiMd(): string {
-  return "@.gemini/kb-import.md\n";
+  return "도메인 지식 질문은 코드 탐색 전에 반드시 KB를 먼저 확인할 것.\n\n@.gemini/kb-import.md\n";
 }
 
 function buildKbImportMd(ctx: WireContext): string {

@@ -5,7 +5,7 @@ import { ensureGitignorePatterns } from "../utils/gitignore.js";
 import type { WireContext } from "./wire.js";
 
 function buildAgentsMd(): string {
-  return "# Knowledge Base\n- 세션 시작 시 반드시 .codex/kb-directive.md 파일을 먼저 읽고 그 안의 경로 지시를 따를 것\n";
+  return "# Knowledge Base\n- 도메인 지식 질문은 코드 탐색 전에 반드시 KB를 먼저 확인할 것\n- 세션 시작 시 반드시 .codex/kb-directive.md 파일을 먼저 읽고 그 안의 경로 지시를 따를 것\n";
 }
 
 function buildDirectiveMd(ctx: WireContext): string {

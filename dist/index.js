@@ -326,7 +326,7 @@ async function wireClaude(ctx) {
 import fs8 from "fs-extra";
 import path7 from "path";
 function buildGeminiMd() {
-  return "@.gemini/kb-import.md\n";
+  return "\uB3C4\uBA54\uC778 \uC9C0\uC2DD \uC9C8\uBB38\uC740 \uCF54\uB4DC \uD0D0\uC0C9 \uC804\uC5D0 \uBC18\uB4DC\uC2DC KB\uB97C \uBA3C\uC800 \uD655\uC778\uD560 \uAC83.\n\n@.gemini/kb-import.md\n";
 }
 function buildKbImportMd(ctx) {
   let content = `## KB \uC808\uB300 \uACBD\uB85C
@@ -391,7 +391,7 @@ async function wireGemini(ctx) {
 import fs9 from "fs-extra";
 import path8 from "path";
 function buildAgentsMd() {
-  return "# Knowledge Base\n- \uC138\uC158 \uC2DC\uC791 \uC2DC \uBC18\uB4DC\uC2DC .codex/kb-directive.md \uD30C\uC77C\uC744 \uBA3C\uC800 \uC77D\uACE0 \uADF8 \uC548\uC758 \uACBD\uB85C \uC9C0\uC2DC\uB97C \uB530\uB97C \uAC83\n";
+  return "# Knowledge Base\n- \uB3C4\uBA54\uC778 \uC9C0\uC2DD \uC9C8\uBB38\uC740 \uCF54\uB4DC \uD0D0\uC0C9 \uC804\uC5D0 \uBC18\uB4DC\uC2DC KB\uB97C \uBA3C\uC800 \uD655\uC778\uD560 \uAC83\n- \uC138\uC158 \uC2DC\uC791 \uC2DC \uBC18\uB4DC\uC2DC .codex/kb-directive.md \uD30C\uC77C\uC744 \uBA3C\uC800 \uC77D\uACE0 \uADF8 \uC548\uC758 \uACBD\uB85C \uC9C0\uC2DC\uB97C \uB530\uB97C \uAC83\n";
 }
 function buildDirectiveMd(ctx) {
   const aiContext = path8.join(ctx.kbPath, "ai-context");
