@@ -23,7 +23,7 @@ jobs:
             -not -path './templates/*' \
             -not -path './99-personal/*' \
             -not -path './00-inbox/*' \
-            -not -path './.github/*'); do
+            -not -path './.github/*' -not -name 'README.md'); do
             if ! head -1 "$f" | grep -q '^---'; then
               echo "MISSING frontmatter: $f"; ERRORS=$((ERRORS+1))
             fi
