@@ -2,6 +2,7 @@
 
 // src/index.ts
 import { Command } from "commander";
+import { createRequire } from "module";
 
 // src/commands/init.ts
 import { input } from "@inquirer/prompts";
@@ -736,8 +737,10 @@ async function uninstallCommand() {
 }
 
 // src/index.ts
+var require2 = createRequire(import.meta.url);
+var { version } = require2("../package.json");
 var program = new Command();
-program.name("kb").description("Team Knowledge Base harness CLI").version("0.1.0");
+program.name("kb").description("Team Knowledge Base harness CLI").version(version);
 program.command("init").description("KB \uCD5C\uCD08 \uC0DD\uC131 (\uD300 \uB9AC\uB4DC)").action(initCommand);
 program.command("join").description("\uAE30\uC874 KB\uC5D0 \uD569\uB958 (\uD300\uC6D0)").argument("<remote-url>", "Git remote URL").action(joinCommand);
 program.command("wire").description("\uD504\uB85C\uC81D\uD2B8\uC5D0 LLM \uB3C4\uAD6C \uC5F0\uACB0").argument("<tool>", "claude | gemini | codex").action(wireCommand);

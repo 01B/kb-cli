@@ -1,16 +1,20 @@
 import { Command } from "commander";
+import { createRequire } from "node:module";
 import { initCommand } from "./commands/init.js";
 import { joinCommand } from "./commands/join.js";
 import { wireCommand } from "./commands/wire.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { uninstallCommand } from "./commands/uninstall.js";
 
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json");
+
 const program = new Command();
 
 program
   .name("kb")
   .description("Team Knowledge Base harness CLI")
-  .version("0.1.0");
+  .version(version);
 
 program
   .command("init")
