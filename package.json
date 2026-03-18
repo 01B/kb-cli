@@ -7,8 +7,7 @@
     "kb": "./dist/index.js"
   },
   "scripts": {
-    "build": "npx tsup",
-    "prepare": "npm run build",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest",
     "lint": "tsc --noEmit"
