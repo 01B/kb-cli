@@ -14,7 +14,7 @@ updated: {{date}}
   - 인덱스가 작으면(50항목 이하) 전체 읽기도 가능
   - 두 인덱스의 항목을 합집합(Union)으로 병합하여 검색
 - 인덱스의 tags, tldr로 관련성을 판단하고, 필요한 노트만 전체 읽기
-- 현재 repo 관련 노트 우선: `repo:` 태그 또는 repo 태그 없는 공통 노트
+- 현재 repo 관련 노트 우선: `repo/` 태그 또는 repo 태그 없는 공통 노트
 
 ## KB 기록 규칙
 - 코딩/분석 중 새로운 비즈니스 룰, 코드 패턴, 장애 원인을 발견하면 KB에 기록 제안
@@ -28,6 +28,7 @@ updated: {{date}}
   - 장애 대응 → troubleshoot/
   - 확실하지 않으면 → drafts/
 - frontmatter 필수: tags, tldr, created, updated
+- 태그 네이밍: 네임스페이스는 `/`로 구분 (예: `repo/gmkt-dc-api`, `tech/redis`, `domain/coupon`)
 - 템플릿(templates/)의 형식을 따를 것
 - 노트를 생성/수정/이동한 직후, rebuild-index.sh를 실행하여 로컬 인덱스(.kb-index.local.json)를 최신화할 것
 
